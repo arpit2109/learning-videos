@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Video Library</title>
+    <style>
+        /* Modern, sleek dark theme inspired by GitHub */
+        :root { 
+            --bg-color: #0d1117; 
+            --sidebar-bg: #161b22; 
+            --border-color: #30363d;
+            --text-main: #c9d1d9; 
+            --accent-color: #58a6ff;
+            --hover-bg: #21262d;
+        }
+
+        body { 
+            margin: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; 
+            display: flex; 
+            height: 100vh; 
+            background: var(--bg-color); 
+            color: var(--text-main); 
+            overflow: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar { 
+            width: 350px; 
+            background: var(--sidebar-bg); 
+            display: flex; 
+            flex-direction: column; 
+            border-right: 1px solid var(--border-color); 
+        }
+
+        .header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h2 { margin: 0 0 10px 0; font-size: 1.2rem; }
+
+        .search-box input { 
+            width: 100%; 
+            padding: 12px; 
+            border-radius: 6px; 
+            border: 1px solid var(--border-color); 
+            background: var(--bg-color); 
+            color: var(--text-main); 
+            box-sizing: border-box; 
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        /* Video List Styling */
+        .video-list { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 10px; 
+        }
+
+        .video-item { 
+            padding: 12px 15px; 
+            margin-bottom: 4px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .video-item::before {
+            content: "▶";
+            margin-right: 10px;
+            font-size: 10px;
+            color: #8b949e;
+        }
+
+        .video-item:hover { background: var(--hover-bg); }
+        
+        .video-item.active { 
+            background: var(--accent-color); 
+            color: #ffffff; 
+            font-weight: bold;
+        }
+        .video-item.active::before { color: #ffffff; }
+
+        /* Main Video Player Area */
+        .main-content { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 40px; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative;
+        }
+
+        .video-container { 
+            width: 100%; 
+            max-width: 1200px; 
+            background: #000; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
+            border: 1px solid var(--border-color);
+        }
+
+        video { 
+            width: 100%; 
+            aspect-ratio: 16/9; 
+            outline: none; 
+            display: block;
+        }
+
+        .now-playing { 
+            margin-top: 24px; 
+            font-size: 1.5rem; 
+            font-weight: 600; 
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        /* Custom Scrollbar for Sidebar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--sidebar-bg); }
+        ::-webkit-scrollbar-thumb { background: #484f58; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8b949e; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="header">
+            <h2>🎥 Video Library (256)</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search videos by name...">
+            </div>
+        </div>
+        <div class="video-list" id="videoList">
+            </div>
+    </div>
+
+    <div class="main-content">
+        <div class="video-container">
+            <video id="player" controls>
+                <source id="videoSource" src="" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <div class="now-playing" id="nowPlaying">Select a video from the sidebar to start playing</div>
+    </div>
+
+    <script>
+        // --- STEP A: THE 256 FILE NAMES ---
+        // If your files are named sequentially (e.g., video_1.mp4 to video_256.mp4), 
+        // this loop generates all 256 names automatically so you don't miss a single one.
+        let videoFiles = [2026_03_22_How Companies Like Amazon Decide What To Build Or Ignore - Using Data.mp4,2026_03_20_Masai LEAP â€“ Daily Leadership Connect.mp4,2026_03_19_Masai LEAP â€“ Daily Leadership Connect.mp4,2026_03_18_Tutorial Session - Revision Session.mp4,2026_03_18_Masai LEAP â€“ Daily Leadership Connect.mp4,2026_03_17_Masai LEAP â€“ Daily Leadership Connect.mp4,2026_03_16_Masai LEAP â€“ Daily Leadership Connect.mp4,2026_03_15_Foundations Of Deep Learning & NLP.mp4,2026_03_13_Announcement Session - End Module Evaluation (Online Mode).mp4,2026_03_10_IRP Session - Interview Prep Live Q&A Session.mp4,2026_03_07_IRP Session - Thinking On Your Feet Handling Curveball Questions.mp4,2026_03_06_IRP Session - Turning Stories Into Success Handling Behavioral & Scenario Questions.mp4,2026_03_05_IRP Session - SQL Advanced - JOINs, Subqueries & Window Functions.mp4,2026_03_03_IRP Session - SQL Fundamentals & Basic Queries.mp4,2026_02_28_IRP Session - Mastering Screening Calls With Winning Etiquette.mp4,2026_02_27_IRP Session - Excel For Business Analytics.mp4,2026_02_25_Announcement Session - End Module Evaluation.mp4,2026_02_23_IRP Session - OpenAI API Projects.mp4,2026_02_21_Building A Resume That Gets Shortlisted.mp4,2026_02_19_Tutorial Sesion - Light Weight CNN, Transformer, Image Segmentation & Image Enhancement.mp4,2026_02_17_Python Essentials For Data Analysis.mp4,2026_02_16_Python APIs + OpenAI API Basics.mp4,2026_02_13_Faculty Session - Image Classification Using Vision Transformers (ViT); Machine Translation - II.mp4,2026_02_12_Faculty Session - Image Classification Using Vision Transformers (ViT); Machine Translation.mp4,2026_02_11_Faculty Session - Time Series Prediction - II.mp4,2026_02_10_Tutorial Session - Time Series Forecasting.mp4,2026_02_05_Tutorial Session - Tutorial Session - Light Weight CNN, GAN.mp4,2026_02_04_Faculty Session - Time Series Prediction.mp4,2026_02_03_Faculty Session - Sentiment Classification - II.mp4,2026_02_02_Faculty Session - Sentiment Classification.mp4,2026_01_31_LMS Helpdesk Session (Optional).mp4,2026_01_30_Tutorial Sesion - Light Weight CNN, Transformer, Image Segmentation & Image Enhancement.mp4,2026_01_29_Faculty Session - Document SimilarityClassification - II.mp4,2026_01_28_Faculty Session - Generative Adversarial Networks (GAN).mp4,2026_01_27_Faculty Session - Transformer Architecture And Variants.mp4,2026_01_23_Faculty Session - Document SimilarityClassification.mp4,2026_01_22_Tutorial Session - GRU, NLP, Optimizer & TemporalNet.mp4,2026_01_21_LMS Doubt Solving And Troubleshooting Session.mp4,2026_01_20_Faculty Session - GRU And Simple Attention Models - II.mp4,2026_01_19_Faculty Session - RNN, LSTM & GRU.mp4,2026_01_17_IRP Session 1 - Interview Readiness Phase Orientation.mp4,2026_01_16_Faculty Session - Data Augmentation - II.mp4,2026_01_15_Faculty Session - Data Augmentation.mp4,2026_01_13_Faculty Session - RNN And LSTM.mp4,2026_01_12_Faculty Session - Vector Models Of Langugae; Word2Vec And GLoVE - II.mp4,2026_01_08_Faculty Session - Demonstration Of GAN And Its Variants - II.mp4,2026_01_07_Faculty Session - Demonstration Of GAN And Its Variants.mp4,2026_01_06_Faculty Session - Vector Models Of Langugae; Word2Vec And GLoVE.mp4,2026_01_05_Faculty Session - CNN Learning Strategies - III.mp4,2026_01_02_Faculty Session - Medical Image Segmentation And Moving Object Detection - II.mp4,2025_12_31_Faculty Session - Medical Image Segmentation And Moving Object Detection.mp4,2025_12_30_Faculty Session - CNN Learning Strategies - II.mp4,2025_12_29_Faculty Session - CNN Learning Strategies.mp4,2025_12_26_Faculty Session - Pedestrian Detection; Implementation Of YOLOv5, Analysis Of Different Tragets - II.mp4,2025_12_24_Faculty Session - Pedestrian Detection; Implementation Of YOLOv5, Analysis Of Different Tragets.mp4,2025_12_24_Briefing Session On The Project Submissions.mp4,2025_12_23_Faculty Session - Encoder-Decoder Architecture Image Segmentation And Enhancement - II.mp4,2025_12_22_Faculty Session - Encoder-Decoder Architecture Image Segmentation And Enhancement.mp4,2025_12_19_Faculty Session - Implementation Of Different CNN Architectures For Image Feature Extraction And Classifications - II.mp4,2025_12_18_Faculty Session - Single  Multiple Object Detection And Performance Analysis - II.mp4,2025_12_17_Faculty Session - Single  Multiple Object Detection And Performance Analysis.mp4,2025_12_16_Faculty Session - Implementation Of Different CNN Architectures For Image Feature Extraction And Classifications.mp4,2025_12_13_Faculty Session - Implementation Of CNNs And Inception Blocks (Practicals) - II.mp4,2025_12_13_How Cybersecurity Has Evolved From Simple Hacks To Todayâ€™S Ransomware Attacks.mp4,2025_12_12_Faculty Session - Implementation Of CNNs And Inception Blocks (Practicals) - II.mp4,2025_12_10_Faculty Session - Implementation Of CNNs And Inception Blocks (Practicals).mp4,2025_12_06_Tutorial Session - Introduction To CNN; Different Convolution Operations.mp4,2025_12_02_Faculty Session - Different Image Classification CNN Architectures - LeNet, AlexNet, VGGNet, ResNet, InceptionNet, MobileNet, ShuffleNet, EfficientNet (Part-1).mp4,2025_12_01_Faculty Session - Different Image Classification CNN Architectures - LeNet, AlexNet, VGGNet, ResNet, InceptionNet, MobileNet, ShuffleNet, EfficientNet (Part-2).mp4,2025_11_29_Faculty Session - Introduction To CNN; Different Convolution Operations - II.mp4,2025_11_28_Introduction To CNN; Different Convolution Operations (Practical).mp4,2025_11_26_Faculty Session  Introduction To CNN; Different Convolution Operations.mp4,2025_11_21_Revision Session 3 - Classification Using Chebyshev Inequality And Bayes Classifier.mp4,2025_11_20_Revision Session 2 - Principal Component Analysis.mp4,2025_11_19_Revision Session 1 - Multi-Layer Perceptron (MLP).mp4,2025_11_15_Tutorial - MLP.mp4,2025_11_10_Tutorial - Assignments.mp4,2025_11_07_Random Forest.mp4,2025_11_06_Decision Tree.mp4,2025_11_05_Classification With Decision Tree.mp4,2025_11_03_HAC And DBSCAN.mp4,2025_11_01_KNN Classifiers & K-D Trees.mp4,2025_10_30_Support Vector Machine - II.mp4,2025_10_29_Support Vector Machine - I.mp4,2025_10_28_HAC And DBSCAN With Clustering Performance Analysis.mp4,2025_10_25_K Means & KNN Practicals.mp4,2025_10_24_EFA Practicals.mp4,2025_10_23_KNN & KD Tree - II.mp4,2025_10_22_KNN & KD Tree.mp4,2025_10_21_Tutorial Session - II  EFA & PyTorch.mp4,2025_10_17_PyTorch Practical - II.mp4,2025_10_16_PyTorch Practical.mp4,2025_10_15_EFA Part - II.mp4,2025_10_14_EFA.mp4,2025_10_08_PyTorch.mp4,2025_10_07_Exploratory Factor Analysis Session.mp4,2025_10_06_PyTorch.mp4,2025_10_03_Principal Component Analysis (PCA).mp4,2025_10_01_Tutorial Session - 1.mp4,2025_09_30_Prerequisite -Principal Component Analysis (PCA).mp4,2025_09_29_MLP Insights, Loss And Activation Functions - II.mp4,2025_09_26_MLP Insights, Loss And Activation Functions.mp4,2025_09_25_Guided Discussion On Assignments.mp4,2025_09_24_Guided Discussion On Assignments.mp4,2025_09_23_Assignment Q&A And Clarification Session.mp4,2025_09_20_Career Pathways - Industry Expert Mohit Kulkarni.mp4,2025_09_18_MLP Insights, Loss And Activation Functions - Prerequisite Session.mp4,2025_09_17_Perceptron.mp4,2025_09_16_Perceptron.mp4,2025_09_15_Perceptron.mp4,2025_09_13_Recommendation Engines How (And Why) Netflix Knows What You Want.mp4,2025_09_12_Logistic Regression.mp4,2025_09_11_Multi-Layer Perceptron.mp4,2025_09_10_Revision Session - II.mp4,2025_09_09_Revision Session- 1.mp4,2025_09_05_Perceptron For Binary Classification Problems - II.mp4,2025_09_03_Perceptron For Binary Classification Problems.mp4,2025_09_02_Logistic Regression.mp4,2025_08_30_Agentic AI Is Changing The Game.mp4,2025_08_29_LDA By Guha Sir.mp4,2025_08_28_Unimodal Background Model- II By Shrihari Sir.mp4,2025_08_27_Live Session.mp4,2025_08_27_Unimodal Background Model By Shrihari Sir.mp4,2025_08_26_Discriminant Functions By Guha Sir.mp4,2025_08_22_Discriminant Functions By Guha Sir.mp4,2025_08_20_Logistic Regression By Guha Sir And Shrihari Sir.mp4,2025_08_19_Discriminant Functions By Guha Sir And Shrihari Sir.mp4,2025_08_18_Performance Analysis & Application In Visual Intrusion Detection By Guha Sir And Shrihari Sir.mp4,2025_08_14_PCA And Discriminant Functions Problem Solving.mp4,2025_08_12_DS Faculty Lecture 15 - Discriminant Functions.mp4,2025_08_11_DS Faculty Lecture 14 - Principal Component Analysis.mp4,2025_08_09_Career Pathways Ask Your Questions!.mp4,2025_08_06_DS Faculty Lecture 13 - Linear And Logistic Regression.mp4,2025_08_05_DS Faculty Lecture 12 - Introduction To Machine Learning.mp4,2025_08_04_Logistic Regression 2.mp4,2025_08_01_Logistic Regression.mp4,2025_07_30_Linear Regression.mp4,2025_07_28_Web Interfacing Session - 2.mp4,2025_07_24_Web Interfacing Session - 1.mp4,2025_07_23_DS Tutorial 12 - Assignment Doubts Solving By TAs.mp4,2025_07_21_Database Interfacing Session - 2.mp4,2025_07_17_Database Interfacing Session - 1.mp4,2025_07_16_DS Tutorial 11 - Assignment Doubts Solving By TAs.mp4,2025_07_15_SQL Session - 2.mp4,2025_07_14_SQL Session - 1.mp4,2025_07_12_Code Talk Session - 1.mp4,2025_07_12_Anveshan Hackathon 2025 â€“ Final Round.mp4,2025_07_03_Maths Revision - 3.mp4,2025_07_02_Python Revision - 4.mp4,2025_07_01_Maths Revision - 2.mp4,2025_06_30_Python Revision - 3.mp4,2025_06_30_DS Faculty Lecture 11 - Introduction To Estimation Theory.mp4,2025_06_28_Maths Revision - 1.mp4,2025_06_27_DS Faculty Lecture 10 - Introduction To Estimation Theory.mp4,2025_06_26_Python Revision - 2.mp4,2025_06_25_Pre-Requisites Introduction To Estimation Theory.mp4,2025_06_24_Python Revision - 1.mp4,2025_06_23_Scikit Learn - 3.mp4,2025_06_19_Basic Optimization Techniques - 2.mp4,2025_06_18_OpenCV Problem Solving.mp4,2025_06_17_Scikit Learn -2.mp4,2025_06_12_Basic Optimization Techniques.mp4,2025_06_11_Pre-Requisites Basic Optimization Techniques.mp4,2025_06_10_Matplotlib And Seaborn Problem Solving.mp4,2025_06_09_Scikit Learn.mp4,2025_06_06_Probability - 3.mp4,2025_06_04_Matplotlib Problem Solving.mp4,2025_06_02_Natural Language Processing - 2.mp4,2025_05_28_Pandas Problem Solving.mp4,2025_05_27_Natural Language Processing.mp4,2025_05_26_Audio Processing With LibROSA - 2.mp4,2025_05_20_Audio Processing With LibROSA.mp4,2025_05_19_Image Processing With OpenCV - 2.mp4,2025_05_17_Probability - 2.mp4,2025_05_16_Probability - 1.mp4,2025_05_14_DS Tutorial 10 - Multivariate Calculus Assignment Solving By TAs.mp4,2025_05_13_Image Processing With OpenCV.mp4,2025_05_12_Python EDA 2.mp4,2025_05_10_Revision Multivariate Calculus.mp4,2025_04_29_Python Pandas 2.mp4,2025_04_28_Python Pandas 1.mp4,2025_04_26_Deep Dive Session - Episode 2.mp4,2025_04_25_Python Numpy.mp4,2025_04_24_Multivariate Calculus Basics.mp4,2025_04_24_Student Connect With Dr. Gaurav Trivedi Sir.mp4,2025_04_23_DS Tutorial 9 - Linear Algebra Assignment Solving By TAs.mp4,2025_04_22_Revision - Python Session.mp4,2025_04_21_Revision - Python Numpy.mp4,2025_04_18_Revision - Linear Algebra With NumPy.mp4,2025_04_17_Linear Algebra With NumPy Transformations & Rotations.mp4,2025_04_16_Linear Algebra With NumPy Foundations & Core Operations.mp4,2025_04_12_Revision - DS Faculty Lecture 8 - Linear Algebra - 2.mp4,2025_04_11_DS Faculty Lecture 8 - Linear Algebra - 2.mp4,2025_04_09_DS Tutorial 8 - Mid Evaluation Solutions (Maths) Discussion By TAs(B2).mp4,2025_04_07_Mid Evaluation Solutions Discussion - Python.mp4,2025_04_05_Deep Dive Session.mp4,2025_04_04_DS Faculty Lecture 7 - Linear Algebra - 2.mp4,2025_04_02_DS Tutorial 7 - Python Doubt Clearing Session.mp4,2025_03_27_Python Problem Solving.mp4,2025_03_26_DS Tutorial 6 - Math Doubt Clearing Session.mp4,2025_03_24_Python Problem Solving - Class And Objects.mp4,2025_03_22_Revision - Basic Statistics.mp4,2025_03_21_Python Classes And Objects - 2.mp4,2025_03_19_Program Coordinator Connect.mp4,2025_03_19_DS Tutorial 5 - Basic Statistics.mp4,2025_03_18_Revision - Python Classes And Objects.mp4,2025_03_17_Python Classes And Objects.mp4,2025_03_15_Revision - DS Faculty Lecture 5 - Basic Statistics - 3.mp4,2025_03_13_DS Faculty Lecture 5 - Basic Statistics - 3.mp4,2025_03_12_Python Programming Session.mp4,2025_03_11_Revision - DS Faculty Lecture 4 - Basic Statistics - 2.mp4,2025_03_10_DS Faculty Lecture 4 - Basic Statistics 2.mp4,2025_03_08_Revision - DS Faculty Lecture 3 - Basic Statistics.mp4,2025_03_07_DS Faculty Lecture 3 - Basic Statistics.mp4,2025_03_06_Basic Mathematics Session - 10.mp4,2025_03_05_DS Tutorial 4 - Calculus Of Single Variables Assignment - 2.mp4,2025_03_03_Python Data Types Problem Solving - 3.mp4,2025_03_01_Basic Mathematics Session - 9.mp4,2025_02_28_Python Data Types Problem Solving - 2.mp4,2025_02_27_Python Data Types Problem Solving - 1.mp4,2025_02_26_DS Tutorial 3 - Calculus Of Single Variables Assignment.mp4,2025_02_24_Basic Mathematics Session - 8.mp4,2025_02_22_Basic Mathematics Session - 7.mp4,2025_02_21_DS Faculty Lecture 2 - Calculus Of Single Variables.mp4,2025_02_21_How To Use The LMS Coding Environment .mp4,2025_02_20_Basic Mathematics Session - 6.mp4,2025_02_19_DS Tutorial 2 - Python Assignment -2.mp4,2025_02_17_Basic Python Programming - 6 (Data Types).mp4,2025_02_15_Basic Mathematics Session - 5.mp4,2025_02_14_Basic Mathematics Session - 4.mp4,2025_02_13_Basic Python Programming - 5.mp4,2025_02_12_DS Tutorial 1 - Linear Algebra Part - 1.mp4,2025_02_10_Basic Python Programming - 4.mp4,2025_02_08_Basic Mathematics Session - 3.mp4,2025_02_07_Basic Mathematics Session - 2.mp4,2025_02_06_Basic Python Programming - 3.mp4,2025_02_04_Basic Python Programming - 2.mp4,2025_02_03_Basic Python Programming - 1.mp4,2025_02_01_Data-Driven Horizons Exploring The Scope.mp4,2025_02_01_Student Connect With Dr. Prithwijit Guha.mp4,2025_01_31_Basic Mathematics Session - 1.mp4,2025_01_30_DS Lab Session 1 - Introduction To Python Programming.mp4,2025_01_29_DS Tutorial 2 - Software Installation Session.mp4,2025_01_28_DS Tutorial 1 - Software Installation Session.mp4,2025_01_27_DS Faculty Lecture 1 - Computational Linear Algebra.mp4,2025_01_24_Platform Onboarding Session.mp4,2025_01_23_Platform Onboarding Session.mp4,2025_01_21_Overview Of Data Science And It'S Applications.mp4,2025_01_20_Virtual Inaugural Session.mp4,2025_05_08_Python EDA 1.mp4,2025_05_06_Python Seaborn.mp4,2025_05_05_Python Matplotlib.mp4,2025_05_02_DS Faculty Lecture 9 - Multivariate Calculus 1.mp4,2025_05_01_Python Pandas 3.mp4,2025_04_03_DS Faculty Lecture 6 - Linear Algebra - 2.mp4,2025_03_22_Revision - Python Classes And Objects -2.mp4];
+        
+        for (let i = 1; i <= 256; i++) {
+            // Change "video_" to whatever prefix your files actually have
+            // .padStart(3, '0') makes it 001, 002 instead of 1, 2. Remove it if not needed.
+            let fileName = `video_${i.toString().padStart(3, '0')}.mp4`;
+            videoFiles.push(fileName);
+        }
+
+        /* IF YOU HAVE EXACT, UNIQUE NAMES, delete the loop above and paste your list here like this:
+        let videoFiles = [
+            "my_first_video.mp4",
+            "another_demo_video.mp4",
+            // ... paste all 256 names here ...
+        ];
+        */
+
+        // --- STEP B: THE LOGIC ---
+        const videoList = document.getElementById('videoList');
+        const searchInput = document.getElementById('searchInput');
+        const player = document.getElementById('player');
+        const videoSource = document.getElementById('videoSource');
+        const nowPlaying = document.getElementById('nowPlaying');
+
+        // Function to render the sidebar list (with search filtering)
+        function renderList(filterText = '') {
+            videoList.innerHTML = ''; // Clear current list
+            
+            // Filter the 256 files based on search
+            const filteredFiles = videoFiles.filter(file => 
+                file.toLowerCase().includes(filterText.toLowerCase())
+            );
+            
+            filteredFiles.forEach(file => {
+                const div = document.createElement('div');
+                div.className = 'video-item';
+                // Remove the .mp4 extension just for a cleaner display name
+                div.textContent = file.replace('.mp4', ''); 
+                
+                // When clicked, play the video
+                div.onclick = () => playVideo(file, div);
+                videoList.appendChild(div);
+            });
+
+            if(filteredFiles.length === 0) {
+                videoList.innerHTML = '<div style="padding: 15px; text-align: center; color: #8b949e;">No videos found.</div>';
+            }
+        }
+
+        // Function to load and play the selected video
+        function playVideo(filename, element) {
+            // Highlight the active video in the sidebar
+            document.querySelectorAll('.video-item').forEach(el => el.classList.remove('active'));
+            if (element) element.classList.add('active');
+            
+            // Update the video player source
+            // ASSUMES your videos are in a folder named "videos/" in your repository
+            videoSource.src = `videos/${filename}`;
+            
+            player.load(); // Reload the video element with the new file
+            player.play().catch(error => {
+                console.log("Autoplay prevented or file not found locally:", error);
+            });
+            
+            // Update the title under the video player
+            nowPlaying.textContent = filename.replace('.mp4', '');
+        }
+
+        // Listen for typing in the search bar
+        searchInput.addEventListener('input', (e) => {
+            renderList(e.target.value);
+        });
+
+        // Generate the list immediately when the page loads
+        renderList();
+    </script>
+</body>
+</html>
