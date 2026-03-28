@@ -778,9 +778,8 @@ function playVideo(l) {
   document.getElementById('playerTitle').textContent = l.title;
   document.getElementById('playerDate').textContent = l.date || '—';
   
-  // Set video source
-  const videoEl = document.getElementById('videoElement');
-  // It assumes the video is in the same directory, or you can prefix a path here if needed
+  // Videos are in the same directory as index.html
+  // encodeURIComponent handles spaces, commas, and special characters in filenames correctly
   videoEl.src = encodeURIComponent(l.filename);
   videoEl.play();
 }
