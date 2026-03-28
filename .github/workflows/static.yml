@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IIT GDS – Learning Videos</title>
+  <meta name="description" content="Complete library of IIT Guwahati Data Science lecture recordings – 256 sessions."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"/>
+  <style>
+    :root {
+      --bg: #080c14;
+      --surface: rgba(255,255,255,0.04);
+      --surface2: rgba(255,255,255,0.07);
+      --border: rgba(255,255,255,0.08);
+      --accent: #6366f1;
+      --accent2: #818cf8;
+      --gold: #f59e0b;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --tag-bg: rgba(99,102,241,0.15);
+      --card-h: #1e293b;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Background orbs ── */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(99,102,241,0.18), transparent 70%);
+      top: -150px; left: -150px;
+    }
+    body::after {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(245,158,11,0.12), transparent 70%);
+      bottom: -100px; right: -100px;
+    }
+
+    /* ── Header ── */
+    header {
+      position: relative; z-index: 10;
+      padding: 56px 24px 40px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(99,102,241,0.07) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .badge {
+      display: inline-block;
+      background: var(--tag-bg);
+      color: var(--accent2);
+      border: 1px solid rgba(99,102,241,0.3);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-size: clamp(28px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #c7d2fe 0%, #818cf8 40%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 14px;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 560px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent2);
+      display: block;
+    }
+    .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+
+    /* ── Controls ── */
+    .controls {
+      position: sticky; top: 0; z-index: 20;
+      background: rgba(8,12,20,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 220px;
+    }
+    .search-wrap svg {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+    #searchInput {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px 10px 40px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    #searchInput:focus { border-color: var(--accent); }
+    #searchInput::placeholder { color: var(--muted); }
+    /* ── Custom Dropdowns ── */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+      user-select: none;
+    }
+    .dropdown-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99,102,241,0.08);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--accent2);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+      white-space: nowrap;
+      min-width: 130px;
+    }
+    .dropdown-btn:hover {
+      background: rgba(99,102,241,0.14);
+      border-color: rgba(99,102,241,0.5);
+    }
+    .dropdown.open .dropdown-btn {
+      border-color: var(--accent);
+      background: rgba(99,102,241,0.18);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.18);
+    }
+    .dropdown-btn .chevron {
+      margin-left: auto;
+      transition: transform .2s;
+      opacity: 0.7;
+    }
+    .dropdown.open .chevron { transform: rotate(180deg); }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 100%;
+      background: rgba(15,21,35,0.97);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 12px;
+      overflow: hidden;
+      z-index: 100;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.1);
+      animation: dropDown .15s ease;
+    }
+    @keyframes dropDown {
+      from { opacity:0; transform: translateY(-6px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .dropdown.open .dropdown-menu { display: block; }
+    .dropdown-item {
+      padding: 9px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dropdown-item:first-child { border-radius: 11px 11px 0 0; }
+    .dropdown-item:last-child  { border-radius: 0 0 11px 11px; }
+    .dropdown-item:hover {
+      background: rgba(99,102,241,0.15);
+      color: var(--accent2);
+    }
+    .dropdown-item.selected {
+      background: rgba(99,102,241,0.2);
+      color: var(--accent2);
+      font-weight: 600;
+    }
+    .dropdown-item .check {
+      margin-left: auto;
+      opacity: 0;
+      color: var(--accent);
+    }
+    .dropdown-item.selected .check { opacity: 1; }
+    .count-badge {
+      background: var(--tag-bg);
+      color: var(--accent2);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ── Tag cloud ── */
+    .tag-cloud {
+      position: relative; z-index: 10;
+      padding: 16px 24px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+    }
+    .tag {
+      background: var(--tag-bg);
+      color: var(--accent2);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+      user-select: none;
+    }
+    .tag:hover, .tag.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* ── Grid ── */
+    main {
+      position: relative; z-index: 10;
+      padding: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+      animation: fadeUp .35s both;
+      cursor: default;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(99,102,241,0.4);
+      box-shadow: 0 12px 40px rgba(99,102,241,0.12);
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .card-date {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      background: rgba(245,158,11,0.1);
+      border-radius: 6px;
+      padding: 3px 8px;
+      white-space: nowrap;
+    }
+    .card-num {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.5;
+      flex: 1;
+    }
+    .card-filename {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: monospace;
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+      padding: 6px 8px;
+      word-break: break-all;
+      line-height: 1.4;
+    }
+    .card-tag {
+      align-self: flex-start;
+      background: var(--tag-bg);
+      color: var(--accent2);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* ── No results ── */
+    #noResults {
+      display: none;
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--muted);
+    }
+    #noResults svg { margin-bottom: 16px; opacity: .4; }
+    #noResults p { font-size: 16px; }
+
+    /* ── Footer ── */
+    footer {
+      position: relative; z-index: 10;
+      text-align: center;
+      padding: 32px 24px;
+      color: var(--muted);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+      margin-top: 24px;
+    }
+    footer a { color: var(--accent2); text-decoration: none; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── Scroll to Top ── */
+    #scrollTopBtn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 44px;
+      height: 44px;
+      background: var(--tag-bg);
+      border: 1px solid rgba(99,102,241,0.3);
+      border-radius: 50%;
+      color: var(--accent2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 50;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    #scrollTopBtn.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    #scrollTopBtn:hover {
+      background: var(--accent);
+      color: #fff;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(99,102,241,0.25);
+    }
+
+    /* ── Video Player View ── */
+    #playerView {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--bg);
+      z-index: 200;
+      overflow-y: auto;
+      padding: 24px;
+      animation: fadeIn .3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .player-header {
+      max-width: 1200px;
+      margin: 0 auto 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .2s, border-color .2s;
+      align-self: flex-start;
+    }
+    .back-btn:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: var(--accent2);
+    }
+    .player-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .player-meta {
+      font-size: 14px;
+      color: var(--accent2);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .player-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #000;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+      aspect-ratio: 16 / 9;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      outline: none;
+    }
+
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
+      .controls { flex-direction: column; }
+      .search-wrap { min-width: 100%; }
+      #scrollTopBtn { bottom: 16px; right: 16px; }
+      #playerView { padding: 16px; }
+      .player-title { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">IIT Guwahati · Data Science</div>
+  <h1>Learning Video Library</h1>
+  <p class="subtitle">Complete archive of lecture recordings from the IIT GDS programme — organised, searchable, and ready to download.</p>
+  <div class="stats-row">
+    <div class="stat"><span class="stat-num" id="totalCount">256</span><span class="stat-label">Lectures</span></div>
+    <div class="stat"><span class="stat-num" id="yearSpan">2</span><span class="stat-label">Years</span></div>
+    <div class="stat"><span class="stat-num" id="topicCount">—</span><span class="stat-label">Topics</span></div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="searchInput" type="search" placeholder="Search lectures, topics, dates…" autocomplete="off"/>
+  </div>
+  
+  <div class="dropdown" id="ddYear">
+    <div class="dropdown-btn" onclick="toggleDD('ddYear')">
+      <span id="ddYearLabel">All Years</span>
+      <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="dropdown-menu">
+      <div class="dropdown-item selected" data-val="" onclick="selectDD('ddYear','',this,'All Years')">All Years <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="2026" onclick="selectDD('ddYear','2026',this,'2026')">2026 <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="2025" onclick="selectDD('ddYear','2025',this,'2025')">2025 <span class="check">✓</span></div>
+    </div>
+  </div>
+
+  <div class="dropdown" id="ddMonth">
+    <div class="dropdown-btn" onclick="toggleDD('ddMonth')">
+      <span id="ddMonthLabel">All Months</span>
+      <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="dropdown-menu">
+      <div class="dropdown-item selected" data-val="" onclick="selectDD('ddMonth','',this,'All Months')">All Months <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="01" onclick="selectDD('ddMonth','01',this,'January')">January <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="02" onclick="selectDD('ddMonth','02',this,'February')">February <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="03" onclick="selectDD('ddMonth','03',this,'March')">March <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="04" onclick="selectDD('ddMonth','04',this,'April')">April <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="05" onclick="selectDD('ddMonth','05',this,'May')">May <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="06" onclick="selectDD('ddMonth','06',this,'June')">June <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="07" onclick="selectDD('ddMonth','07',this,'July')">July <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="08" onclick="selectDD('ddMonth','08',this,'August')">August <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="09" onclick="selectDD('ddMonth','09',this,'September')">September <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="10" onclick="selectDD('ddMonth','10',this,'October')">October <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="11" onclick="selectDD('ddMonth','11',this,'November')">November <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="12" onclick="selectDD('ddMonth','12',this,'December')">December <span class="check">✓</span></div>
+    </div>
+  </div>
+
+  <div class="dropdown" id="ddSort">
+    <div class="dropdown-btn" onclick="toggleDD('ddSort')">
+      <span id="ddSortLabel">Newest First</span>
+      <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="dropdown-menu">
+      <div class="dropdown-item selected" data-val="newest" onclick="selectDD('ddSort','newest',this,'Newest First')">Newest First <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="oldest" onclick="selectDD('ddSort','oldest',this,'Oldest First')">Oldest First <span class="check">✓</span></div>
+      <div class="dropdown-item" data-val="az" onclick="selectDD('ddSort','az',this,'A → Z')">A → Z <span class="check">✓</span></div>
+    </div>
+  </div>
+
+  <span class="count-badge" id="visibleCount">256 results</span>
+</div>
+
+<div class="tag-cloud" id="tagCloud"></div>
+
+<main id="mainView">
+  <div class="grid" id="grid"></div>
+  <div id="noResults">
+    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <p>No lectures match your search.</p>
+  </div>
+</main>
+
+<div id="playerView">
+  <div class="player-header">
+    <div class="back-btn" onclick="closePlayer()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Lectures
+    </div>
+    <div class="player-title" id="playerTitle">Lecture Title</div>
+    <div class="player-meta">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span id="playerDate">Date</span>
+    </div>
+  </div>
+  <div class="player-container">
+    <video id="videoElement" controls preload="auto">
+      Your browser does not support HTML5 video.
+    </video>
+  </div>
+</div>
+
+<div id="scrollTopBtn" onclick="window.scrollTo({top:0, behavior:'smooth'})" title="Back to top">
+  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+</div>
+
+<footer id="mainFooter">
+  IIT GDS Learning Videos &nbsp;·&nbsp; <a href="https://github.com/arpit2109/learning-videos" target="_blank">GitHub Repository</a>
+</footer>
+
+<script>
+const FILENAMES = ["2026_03_22_How Companies Like Amazon Decide What To Build Or Ignore - Using Data.mp4", "2026_03_20_Masai LEAP – Daily Leadership Connect.mp4", "2026_03_19_Masai LEAP – Daily Leadership Connect.mp4", "2026_03_18_Tutorial Session - Revision Session.mp4", "2026_03_18_Masai LEAP – Daily Leadership Connect.mp4", "2026_03_17_Masai LEAP – Daily Leadership Connect.mp4", "2026_03_16_Masai LEAP – Daily Leadership Connect.mp4", "2026_03_15_Foundations Of Deep Learning & NLP.mp4", "2026_03_13_Announcement Session - End Module Evaluation (Online Mode).mp4", "2026_03_10_IRP Session - Interview Prep Live Q&A Session.mp4", "2026_03_07_IRP Session - Thinking On Your Feet Handling Curveball Questions.mp4", "2026_03_06_IRP Session - Turning Stories Into Success Handling Behavioral & Scenario Questions.mp4", "2026_03_05_IRP Session - SQL Advanced - JOINs, Subqueries & Window Functions.mp4", "2026_03_03_IRP Session - SQL Fundamentals & Basic Queries.mp4", "2026_02_28_IRP Session - Mastering Screening Calls With Winning Etiquette.mp4", "2026_02_27_IRP Session - Excel For Business Analytics.mp4", "2026_02_25_Announcement Session - End Module Evaluation.mp4", "2026_02_23_IRP Session - OpenAI API Projects.mp4", "2026_02_21_Building A Resume That Gets Shortlisted.mp4", "2026_02_19_Tutorial Sesion - Light Weight CNN, Transformer, Image Segmentation & Image Enhancement.mp4", "2026_02_17_Python Essentials For Data Analysis.mp4", "2026_02_16_Python APIs + OpenAI API Basics.mp4", "2026_02_13_Faculty Session - Image Classification Using Vision Transformers (ViT); Machine Translation - II.mp4", "2026_02_12_Faculty Session - Image Classification Using Vision Transformers (ViT); Machine Translation.mp4", "2026_02_11_Faculty Session - Time Series Prediction - II.mp4", "2026_02_10_Tutorial Session - Time Series Forecasting.mp4", "2026_02_05_Tutorial Session - Tutorial Session - Light Weight CNN, GAN.mp4", "2026_02_04_Faculty Session - Time Series Prediction.mp4", "2026_02_03_Faculty Session - Sentiment Classification - II.mp4", "2026_02_02_Faculty Session - Sentiment Classification.mp4", "2026_01_31_LMS Helpdesk Session (Optional).mp4", "2026_01_30_Tutorial Sesion - Light Weight CNN, Transformer, Image Segmentation & Image Enhancement.mp4", "2026_01_29_Faculty Session - Document SimilarityClassification - II.mp4", "2026_01_28_Faculty Session - Generative Adversarial Networks (GAN).mp4", "2026_01_27_Faculty Session - Transformer Architecture And Variants.mp4", "2026_01_23_Faculty Session - Document SimilarityClassification.mp4", "2026_01_22_Tutorial Session - GRU, NLP, Optimizer & TemporalNet.mp4", "2026_01_21_LMS Doubt Solving And Troubleshooting Session.mp4", "2026_01_20_Faculty Session - GRU And Simple Attention Models - II.mp4", "2026_01_19_Faculty Session - RNN, LSTM & GRU.mp4", "2026_01_17_IRP Session 1 - Interview Readiness Phase Orientation.mp4", "2026_01_16_Faculty Session - Data Augmentation - II.mp4", "2026_01_15_Faculty Session - Data Augmentation.mp4", "2026_01_13_Faculty Session - RNN And LSTM.mp4", "2026_01_12_Faculty Session - Vector Models Of Langugae; Word2Vec And GLoVE - II.mp4", "2026_01_08_Faculty Session - Demonstration Of GAN And Its Variants - II.mp4", "2026_01_07_Faculty Session - Demonstration Of GAN And Its Variants.mp4", "2026_01_06_Faculty Session - Vector Models Of Langugae; Word2Vec And GLoVE.mp4", "2026_01_05_Faculty Session - CNN Learning Strategies - III.mp4", "2026_01_02_Faculty Session - Medical Image Segmentation And Moving Object Detection - II.mp4", "2025_12_31_Faculty Session - Medical Image Segmentation And Moving Object Detection.mp4", "2025_12_30_Faculty Session - CNN Learning Strategies - II.mp4", "2025_12_29_Faculty Session - CNN Learning Strategies.mp4", "2025_12_26_Faculty Session - Pedestrian Detection; Implementation Of YOLOv5, Analysis Of Different Tragets - II.mp4", "2025_12_24_Faculty Session - Pedestrian Detection; Implementation Of YOLOv5, Analysis Of Different Tragets.mp4", "2025_12_24_Briefing Session On The Project Submissions.mp4", "2025_12_23_Faculty Session - Encoder-Decoder Architecture Image Segmentation And Enhancement - II.mp4", "2025_12_22_Faculty Session - Encoder-Decoder Architecture Image Segmentation And Enhancement.mp4", "2025_12_19_Faculty Session - Implementation Of Different CNN Architectures For Image Feature Extraction And Classifications - II.mp4", "2025_12_18_Faculty Session - Single  Multiple Object Detection And Performance Analysis - II.mp4", "2025_12_17_Faculty Session - Single  Multiple Object Detection And Performance Analysis.mp4", "2025_12_16_Faculty Session - Implementation Of Different CNN Architectures For Image Feature Extraction And Classifications.mp4", "2025_12_13_Faculty Session - Implementation Of CNNs And Inception Blocks (Practicals) - II.mp4", "2025_12_13_How Cybersecurity Has Evolved From Simple Hacks To Today’S Ransomware Attacks.mp4", "2025_12_12_Faculty Session - Implementation Of CNNs And Inception Blocks (Practicals) - II.mp4", "2025_12_10_Faculty Session - Implementation Of CNNs And Inception Blocks (Practicals).mp4", "2025_12_06_Tutorial Session - Introduction To CNN; Different Convolution Operations.mp4", "2025_12_02_Faculty Session - Different Image Classification CNN Architectures - LeNet, AlexNet, VGGNet, ResNet, InceptionNet, MobileNet, ShuffleNet, EfficientNet (Part-1).mp4", "2025_12_01_Faculty Session - Different Image Classification CNN Architectures - LeNet, AlexNet, VGGNet, ResNet, InceptionNet, MobileNet, ShuffleNet, EfficientNet (Part-2).mp4", "2025_11_29_Faculty Session - Introduction To CNN; Different Convolution Operations - II.mp4", "2025_11_28_Introduction To CNN; Different Convolution Operations (Practical).mp4", "2025_11_26_Faculty Session  Introduction To CNN; Different Convolution Operations.mp4", "2025_11_21_Revision Session 3 - Classification Using Chebyshev Inequality And Bayes Classifier.mp4", "2025_11_20_Revision Session 2 - Principal Component Analysis.mp4", "2025_11_19_Revision Session 1 - Multi-Layer Perceptron (MLP).mp4", "2025_11_15_Tutorial - MLP.mp4", "2025_11_10_Tutorial - Assignments.mp4", "2025_11_07_Random Forest.mp4", "2025_11_06_Decision Tree.mp4", "2025_11_05_Classification With Decision Tree.mp4", "2025_11_03_HAC And DBSCAN.mp4", "2025_11_01_KNN Classifiers & K-D Trees.mp4", "2025_10_30_Support Vector Machine - II.mp4", "2025_10_29_Support Vector Machine - I.mp4", "2025_10_28_HAC And DBSCAN With Clustering Performance Analysis.mp4", "2025_10_25_K Means & KNN Practicals.mp4", "2025_10_24_EFA Practicals.mp4", "2025_10_23_KNN & KD Tree - II.mp4", "2025_10_22_KNN & KD Tree.mp4", "2025_10_21_Tutorial Session - II  EFA & PyTorch.mp4", "2025_10_17_PyTorch Practical - II.mp4", "2025_10_16_PyTorch Practical.mp4", "2025_10_15_EFA Part - II.mp4", "2025_10_14_EFA.mp4", "2025_10_08_PyTorch.mp4", "2025_10_07_Exploratory Factor Analysis Session.mp4", "2025_10_06_PyTorch.mp4", "2025_10_03_Principal Component Analysis (PCA).mp4", "2025_10_01_Tutorial Session - 1.mp4", "2025_09_30_Prerequisite -Principal Component Analysis (PCA).mp4", "2025_09_29_MLP Insights, Loss And Activation Functions - II.mp4", "2025_09_26_MLP Insights, Loss And Activation Functions.mp4", "2025_09_25_Guided Discussion On Assignments.mp4", "2025_09_24_Guided Discussion On Assignments.mp4", "2025_09_23_Assignment Q&A And Clarification Session.mp4", "2025_09_20_Career Pathways - Industry Expert Mohit Kulkarni.mp4", "2025_09_18_MLP Insights, Loss And Activation Functions - Prerequisite Session.mp4", "2025_09_17_Perceptron.mp4", "2025_09_16_Perceptron.mp4", "2025_09_15_Perceptron.mp4", "2025_09_13_Recommendation Engines How (And Why) Netflix Knows What You Want.mp4", "2025_09_12_Logistic Regression.mp4", "2025_09_11_Multi-Layer Perceptron.mp4", "2025_09_10_Revision Session - II.mp4", "2025_09_09_Revision Session- 1.mp4", "2025_09_05_Perceptron For Binary Classification Problems - II.mp4", "2025_09_03_Perceptron For Binary Classification Problems.mp4", "2025_09_02_Logistic Regression.mp4", "2025_08_30_Agentic AI Is Changing The Game.mp4", "2025_08_29_LDA By Guha Sir.mp4", "2025_08_28_Unimodal Background Model- II By Shrihari Sir.mp4", "2025_08_27_Live Session.mp4", "2025_08_27_Unimodal Background Model By Shrihari Sir.mp4", "2025_08_26_Discriminant Functions By Guha Sir.mp4", "2025_08_22_Discriminant Functions By Guha Sir.mp4", "2025_08_20_Logistic Regression By Guha Sir And Shrihari Sir.mp4", "2025_08_19_Discriminant Functions By Guha Sir And Shrihari Sir.mp4", "2025_08_18_Performance Analysis & Application In Visual Intrusion Detection By Guha Sir And Shrihari Sir.mp4", "2025_08_14_PCA And Discriminant Functions Problem Solving.mp4", "2025_08_12_DS Faculty Lecture 15 - Discriminant Functions.mp4", "2025_08_11_DS Faculty Lecture 14 - Principal Component Analysis.mp4", "2025_08_09_Career Pathways Ask Your Questions!.mp4", "2025_08_06_DS Faculty Lecture 13 - Linear And Logistic Regression.mp4", "2025_08_05_DS Faculty Lecture 12 - Introduction To Machine Learning.mp4", "2025_08_04_Logistic Regression 2.mp4", "2025_08_01_Logistic Regression.mp4", "2025_07_30_Linear Regression.mp4", "2025_07_28_Web Interfacing Session - 2.mp4", "2025_07_24_Web Interfacing Session - 1.mp4", "2025_07_23_DS Tutorial 12 - Assignment Doubts Solving By TAs.mp4", "2025_07_21_Database Interfacing Session - 2.mp4", "2025_07_17_Database Interfacing Session - 1.mp4", "2025_07_16_DS Tutorial 11 - Assignment Doubts Solving By TAs.mp4", "2025_07_15_SQL Session - 2.mp4", "2025_07_14_SQL Session - 1.mp4", "2025_07_12_Code Talk Session - 1.mp4", "2025_07_12_Anveshan Hackathon 2025 – Final Round.mp4", "2025_07_03_Maths Revision - 3.mp4", "2025_07_02_Python Revision - 4.mp4", "2025_07_01_Maths Revision - 2.mp4", "2025_06_30_Python Revision - 3.mp4", "2025_06_30_DS Faculty Lecture 11 - Introduction To Estimation Theory.mp4", "2025_06_28_Maths Revision - 1.mp4", "2025_06_27_DS Faculty Lecture 10 - Introduction To Estimation Theory.mp4", "2025_06_26_Python Revision - 2.mp4", "2025_06_25_Pre-Requisites Introduction To Estimation Theory.mp4", "2025_06_24_Python Revision - 1.mp4", "2025_06_23_Scikit Learn - 3.mp4", "2025_06_19_Basic Optimization Techniques - 2.mp4", "2025_06_18_OpenCV Problem Solving.mp4", "2025_06_17_Scikit Learn -2.mp4", "2025_06_12_Basic Optimization Techniques.mp4", "2025_06_11_Pre-Requisites Basic Optimization Techniques.mp4", "2025_06_10_Matplotlib And Seaborn Problem Solving.mp4", "2025_06_09_Scikit Learn.mp4", "2025_06_06_Probability - 3.mp4", "2025_06_04_Matplotlib Problem Solving.mp4", "2025_06_02_Natural Language Processing - 2.mp4", "2025_05_28_Pandas Problem Solving.mp4", "2025_05_27_Natural Language Processing.mp4", "2025_05_26_Audio Processing With LibROSA - 2.mp4", "2025_05_20_Audio Processing With LibROSA.mp4", "2025_05_19_Image Processing With OpenCV - 2.mp4", "2025_05_17_Probability - 2.mp4", "2025_05_16_Probability - 1.mp4", "2025_05_14_DS Tutorial 10 - Multivariate Calculus Assignment Solving By TAs.mp4", "2025_05_13_Image Processing With OpenCV.mp4", "2025_05_12_Python EDA 2.mp4", "2025_05_10_Revision Multivariate Calculus.mp4", "2025_04_29_Python Pandas 2.mp4", "2025_04_28_Python Pandas 1.mp4", "2025_04_26_Deep Dive Session - Episode 2.mp4", "2025_04_25_Python Numpy.mp4", "2025_04_24_Multivariate Calculus Basics.mp4", "2025_04_24_Student Connect With Dr. Gaurav Trivedi Sir.mp4", "2025_04_23_DS Tutorial 9 - Linear Algebra Assignment Solving By TAs.mp4", "2025_04_22_Revision - Python Session.mp4", "2025_04_21_Revision - Python Numpy.mp4", "2025_04_18_Revision - Linear Algebra With NumPy.mp4", "2025_04_17_Linear Algebra With NumPy Transformations & Rotations.mp4", "2025_04_16_Linear Algebra With NumPy Foundations & Core Operations.mp4", "2025_04_12_Revision - DS Faculty Lecture 8 - Linear Algebra - 2.mp4", "2025_04_11_DS Faculty Lecture 8 - Linear Algebra - 2.mp4", "2025_04_09_DS Tutorial 8 - Mid Evaluation Solutions (Maths) Discussion By TAs(B2).mp4", "2025_04_07_Mid Evaluation Solutions Discussion - Python.mp4", "2025_04_05_Deep Dive Session.mp4", "2025_04_04_DS Faculty Lecture 7 - Linear Algebra - 2.mp4", "2025_04_02_DS Tutorial 7 - Python Doubt Clearing Session.mp4", "2025_03_27_Python Problem Solving.mp4", "2025_03_26_DS Tutorial 6 - Math Doubt Clearing Session.mp4", "2025_03_24_Python Problem Solving - Class And Objects.mp4", "2025_03_22_Revision - Basic Statistics.mp4", "2025_03_21_Python Classes And Objects - 2.mp4", "2025_03_19_Program Coordinator Connect.mp4", "2025_03_19_DS Tutorial 5 - Basic Statistics.mp4", "2025_03_18_Revision - Python Classes And Objects.mp4", "2025_03_17_Python Classes And Objects.mp4", "2025_03_15_Revision - DS Faculty Lecture 5 - Basic Statistics - 3.mp4", "2025_03_13_DS Faculty Lecture 5 - Basic Statistics - 3.mp4", "2025_03_12_Python Programming Session.mp4", "2025_03_11_Revision - DS Faculty Lecture 4 - Basic Statistics - 2.mp4", "2025_03_10_DS Faculty Lecture 4 - Basic Statistics 2.mp4", "2025_03_08_Revision - DS Faculty Lecture 3 - Basic Statistics.mp4", "2025_03_07_DS Faculty Lecture 3 - Basic Statistics.mp4", "2025_03_06_Basic Mathematics Session - 10.mp4", "2025_03_05_DS Tutorial 4 - Calculus Of Single Variables Assignment - 2.mp4", "2025_03_03_Python Data Types Problem Solving - 3.mp4", "2025_03_01_Basic Mathematics Session - 9.mp4", "2025_02_28_Python Data Types Problem Solving - 2.mp4", "2025_02_27_Python Data Types Problem Solving - 1.mp4", "2025_02_26_DS Tutorial 3 - Calculus Of Single Variables Assignment.mp4", "2025_02_24_Basic Mathematics Session - 8.mp4", "2025_02_22_Basic Mathematics Session - 7.mp4", "2025_02_21_DS Faculty Lecture 2 - Calculus Of Single Variables.mp4", "2025_02_21_How To Use The LMS Coding Environment .mp4", "2025_02_20_Basic Mathematics Session - 6.mp4", "2025_02_19_DS Tutorial 2 - Python Assignment -2.mp4", "2025_02_17_Basic Python Programming - 6 (Data Types).mp4", "2025_02_15_Basic Mathematics Session - 5.mp4", "2025_02_14_Basic Mathematics Session - 4.mp4", "2025_02_13_Basic Python Programming - 5.mp4", "2025_02_12_DS Tutorial 1 - Linear Algebra Part - 1.mp4", "2025_02_10_Basic Python Programming - 4.mp4", "2025_02_08_Basic Mathematics Session - 3.mp4", "2025_02_07_Basic Mathematics Session - 2.mp4", "2025_02_06_Basic Python Programming - 3.mp4", "2025_02_04_Basic Python Programming - 2.mp4", "2025_02_03_Basic Python Programming - 1.mp4", "2025_02_01_Data-Driven Horizons Exploring The Scope.mp4", "2025_02_01_Student Connect With Dr. Prithwijit Guha.mp4", "2025_01_31_Basic Mathematics Session - 1.mp4", "2025_01_30_DS Lab Session 1 - Introduction To Python Programming.mp4", "2025_01_29_DS Tutorial 2 - Software Installation Session.mp4", "2025_01_28_DS Tutorial 1 - Software Installation Session.mp4", "2025_01_27_DS Faculty Lecture 1 - Computational Linear Algebra.mp4", "2025_01_24_Platform Onboarding Session.mp4", "2025_01_23_Platform Onboarding Session.mp4", "2025_01_21_Overview Of Data Science And It'S Applications.mp4", "2025_01_20_Virtual Inaugural Session.mp4", "2025_05_08_Python EDA 1.mp4", "2025_05_06_Python Seaborn.mp4", "2025_05_05_Python Matplotlib.mp4", "2025_05_02_DS Faculty Lecture 9 - Multivariate Calculus 1.mp4", "2025_05_01_Python Pandas 3.mp4", "2025_04_03_DS Faculty Lecture 6 - Linear Algebra - 2.mp4", "2025_03_22_Revision - Python Classes And Objects -2.mp4"];
+
+const MONTHS = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function parseFilename(fn) {
+  const noExt = fn.replace(/\.mp4$/i, '');
+  const m = noExt.match(/^(\d{4})_(\d{2})_(\d{2})_(.+)$/);
+  if (!m) return { date:'', year:'', month:'', title: noExt, filename: fn };
+  const [, y, mo, d, title] = m;
+  return {
+    date: `${d} ${MONTHS[+mo]} ${y}`,
+    sortKey: `${y}${mo}${d}`,
+    year: y, month: mo,
+    title: title.trim(),
+    filename: fn
+  };
+}
+
+function getTag(title) {
+  const t = title.toLowerCase();
+  if (t.includes('irp') || t.includes('interview')) return 'Interview Prep';
+  if (t.includes('python')) return 'Python';
+  if (t.includes('sql')) return 'SQL';
+  if (t.includes('cnn') || t.includes('convolution')) return 'CNN';
+  if (t.includes('rnn') || t.includes('lstm') || t.includes('gru')) return 'RNN/LSTM';
+  if (t.includes('transformer')) return 'Transformer';
+  if (t.includes('gan')) return 'GAN';
+  if (t.includes('nlp') || t.includes('natural language')) return 'NLP';
+  if (t.includes('regression')) return 'Regression';
+  if (t.includes('perceptron') || t.includes('mlp')) return 'MLP';
+  if (t.includes('svm') || t.includes('support vector')) return 'SVM';
+  if (t.includes('pca') || t.includes('principal component')) return 'PCA';
+  if (t.includes('clustering') || t.includes('kmean') || t.includes('dbscan') || t.includes('hac')) return 'Clustering';
+  if (t.includes('pytorch')) return 'PyTorch';
+  if (t.includes('linear algebra')) return 'Linear Algebra';
+  if (t.includes('calculus')) return 'Calculus';
+  if (t.includes('statistics') || t.includes('probability')) return 'Stats & Prob';
+  if (t.includes('tutorial') || t.includes('revision')) return 'Tutorial';
+  if (t.includes('faculty')) return 'Faculty Lecture';
+  if (t.includes('pandas') || t.includes('numpy') || t.includes('matplotlib') || t.includes('seaborn') || t.includes('scikit') || t.includes('eda')) return 'Data Tools';
+  if (t.includes('opencv') || t.includes('image')) return 'Computer Vision';
+  if (t.includes('career') || t.includes('resume') || t.includes('leap')) return 'Career';
+  return 'General';
+}
+
+const TAG_COLORS = {
+  'Python':'#f97316','SQL':'#06b6d4','CNN':'#8b5cf6','RNN/LSTM':'#ec4899',
+  'Transformer':'#a78bfa','GAN':'#f43f5e','NLP':'#10b981','Regression':'#3b82f6',
+  'MLP':'#6366f1','SVM':'#0ea5e9','PCA':'#f59e0b','Clustering':'#14b8a6',
+  'PyTorch':'#e55b45','Linear Algebra':'#84cc16','Calculus':'#fbbf24',
+  'Stats & Prob':'#60a5fa','Tutorial':'#94a3b8','Faculty Lecture':'#818cf8',
+  'Data Tools':'#34d399','Computer Vision':'#c084fc','Career':'#fb923c',
+  'Interview Prep':'#f472b6','General':'#64748b'
+};
+
+const lectures = FILENAMES.map((fn, i) => {
+  const p = parseFilename(fn.trim());
+  return { ...p, index: i+1, tag: getTag(p.title) };
+});
+
+// Stats
+const topics = new Set(lectures.map(l => l.tag));
+document.getElementById('topicCount').textContent = topics.size;
+
+// Tag cloud
+const tagCounts = {};
+lectures.forEach(l => { tagCounts[l.tag] = (tagCounts[l.tag]||0)+1; });
+const tagCloud = document.getElementById('tagCloud');
+let activeTag = '';
+const allTagEl = document.createElement('span');
+allTagEl.className = 'tag active'; allTagEl.textContent = 'All';
+allTagEl.onclick = () => { activeTag=''; allTagEl.classList.add('active'); document.querySelectorAll('.tag:not(:first-child)').forEach(t=>t.classList.remove('active')); render(); };
+tagCloud.appendChild(allTagEl);
+Object.entries(tagCounts).sort((a,b)=>b[1]-a[1]).forEach(([tag, cnt]) => {
+  const el = document.createElement('span');
+  el.className = 'tag';
+  el.style.setProperty('--tc', TAG_COLORS[tag]||'#6366f1');
+  el.textContent = `${tag} (${cnt})`;
+  el.onclick = () => {
+    activeTag = activeTag===tag ? '' : tag;
+    document.querySelectorAll('.tag').forEach(t=>t.classList.remove('active'));
+    if (activeTag) el.classList.add('active'); else allTagEl.classList.add('active');
+    render();
+  };
+  tagCloud.appendChild(el);
+});
+
+const grid = document.getElementById('grid');
+const noRes = document.getElementById('noResults');
+const visEl = document.getElementById('visibleCount');
+
+let currentFilters = { yr: '', mo: '', sort: 'newest' };
+
+function toggleDD(id) {
+  const dd = document.getElementById(id);
+  const wasOpen = dd.classList.contains('open');
+  document.querySelectorAll('.dropdown.open').forEach(el => el.classList.remove('open'));
+  if (!wasOpen) dd.classList.add('open');
+}
+
+function selectDD(ddId, val, el, labelText) {
+  document.getElementById(ddId+'Label').textContent = labelText;
+  document.querySelectorAll(`#${ddId} .dropdown-item`).forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById(ddId).classList.remove('open');
+  
+  if (ddId === 'ddYear') currentFilters.yr = val;
+  if (ddId === 'ddMonth') currentFilters.mo = val;
+  if (ddId === 'ddSort') currentFilters.sort = val;
+  
+  render();
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.dropdown')) {
+    document.querySelectorAll('.dropdown.open').forEach(el => el.classList.remove('open'));
+  }
+});
+
+function render() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const { yr, mo, sort } = currentFilters;
+
+  let filtered = lectures.filter(l => {
+    if (yr && l.year !== yr) return false;
+    if (mo && l.month !== mo) return false;
+    if (activeTag && l.tag !== activeTag) return false;
+    if (q && !l.title.toLowerCase().includes(q) && !l.filename.toLowerCase().includes(q) && !l.date.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  if (sort === 'newest') filtered.sort((a,b) => b.sortKey?.localeCompare(a.sortKey||''));
+  else if (sort === 'oldest') filtered.sort((a,b) => a.sortKey?.localeCompare(b.sortKey||''));
+  else filtered.sort((a,b) => a.title.localeCompare(b.title));
+
+  visEl.textContent = `${filtered.length} result${filtered.length!==1?'s':''}`;
+  grid.innerHTML = '';
+  noRes.style.display = filtered.length ? 'none' : 'block';
+
+  filtered.forEach((l, i) => {
+    const tagColor = TAG_COLORS[l.tag] || '#6366f1';
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.animationDelay = `${Math.min(i*0.03, 0.5)}s`;
+    card.style.cursor = 'pointer'; // Make the whole card clickable visually
+    card.onclick = () => playVideo(l);
+    card.innerHTML = `
+      <div class="card-top">
+        <span class="card-date">${l.date || '—'}</span>
+        <span class="card-num">#${l.index}</span>
+      </div>
+      <div class="card-title">${l.title}</div>
+      <span class="card-tag" style="background:${tagColor}22;color:${tagColor}">${l.tag}</span>
+      <div class="card-filename">${l.filename}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function playVideo(l) {
+  // Hide main views
+  document.querySelector('header').style.display = 'none';
+  document.querySelector('.controls').style.display = 'none';
+  document.getElementById('tagCloud').style.display = 'none';
+  document.getElementById('mainView').style.display = 'none';
+  document.getElementById('mainFooter').style.display = 'none';
+  document.getElementById('scrollTopBtn').style.display = 'none';
+  
+  // Show player view
+  const playerView = document.getElementById('playerView');
+  playerView.style.display = 'block';
+  window.scrollTo(0, 0);
+
+  // Set video info
+  document.getElementById('playerTitle').textContent = l.title;
+  document.getElementById('playerDate').textContent = l.date || '—';
+  
+  // Set video source
+  const videoEl = document.getElementById('videoElement');
+  // It assumes the video is in the same directory, or you can prefix a path here if needed
+  videoEl.src = encodeURIComponent(l.filename);
+  videoEl.play();
+}
+
+function closePlayer() {
+  const videoEl = document.getElementById('videoElement');
+  videoEl.pause();
+  videoEl.src = ''; // Clear source to stop buffering
+  
+  // Hide player view
+  document.getElementById('playerView').style.display = 'none';
+  
+  // Restore main views
+  document.querySelector('header').style.display = 'block';
+  document.querySelector('.controls').style.display = 'flex';
+  document.getElementById('tagCloud').style.display = 'flex';
+  document.getElementById('mainView').style.display = 'block';
+  document.getElementById('mainFooter').style.display = 'block';
+  
+  // No need to show scrollTopBtn manually, the scroll event listener will handle it
+}
+
+document.getElementById('searchInput').addEventListener('input', render);
+
+// Scroll to top button logic
+const scrollBtn = document.getElementById('scrollTopBtn');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 400) {
+    scrollBtn.classList.add('visible');
+  } else {
+    scrollBtn.classList.remove('visible');
+  }
+});
+
+render();
+
+</script>
+</body>
+</html>
